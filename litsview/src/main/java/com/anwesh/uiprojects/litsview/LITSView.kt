@@ -157,4 +157,27 @@ class LITSView(ctx : Context) : View(ctx) {
             curr.draw(canvas, paint)
         }
     }
+
+    data class Renderer(var view : LITSView) {
+
+        private val lits : Lits = Lits(0)
+
+        private val animator : Animator = Animator(view)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            lits.draw(canvas, paint)
+            animator.update {
+                lits.update {i, it ->
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            lits.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
