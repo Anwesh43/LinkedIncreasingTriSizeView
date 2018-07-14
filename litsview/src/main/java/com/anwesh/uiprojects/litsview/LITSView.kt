@@ -133,4 +133,28 @@ class LITSView(ctx : Context) : View(ctx) {
             next?.draw(canvas, paint)
         }
     }
+
+    data class Lits(var i : Int) {
+
+        private var curr : LITSNode = LITSNode(0)
+
+        private var dir : Int = 1
+
+        fun update(stopcb : (Int, Float) -> Unit) {
+            curr.update {i, scale ->
+                curr = curr.getNext(dir) {
+                    dir *= -1
+                }
+                stopcb(i, scale)
+            }
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            curr.startUpdating(startcb)
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            curr.draw(canvas, paint)
+        }
+    }
 }
