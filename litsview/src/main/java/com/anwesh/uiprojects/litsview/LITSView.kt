@@ -9,6 +9,7 @@ import android.view.View
 import android.view.MotionEvent
 import android.graphics.Paint
 import android.graphics.Canvas
+import android.graphics.Color
 
 val nodes : Int = 5
 
@@ -73,6 +74,63 @@ class LITSView(ctx : Context) : View(ctx) {
 
                 }
             }
+        }
+    }
+
+    data class LITSNode(var i : Int = 0, val state : State = State()) {
+
+        private var prev : LITSNode? = null
+
+        private var next : LITSNode? = null
+
+        fun addNeighbor() {
+            if (i < nodes - 1) {
+                next = LITSNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        init {
+            addNeighbor()
+        }
+
+        fun update(stopcb : (Int, Float) -> Unit) {
+            state.update {
+                stopcb(i, it)
+            }
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : LITSNode {
+            var curr : LITSNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            val w : Float = canvas.width.toFloat()
+            val h : Float = canvas.height.toFloat()
+            val size : Float = Math.min(w, h) / (nodes + 1)
+            val currSize : Float = size * (i + 1) + size * this.state.scale
+            paint.color = Color.parseColor("#2e3c71")
+            paint.strokeCap = Paint.Cap.ROUND
+            paint.strokeWidth = Math.min(w, h) / 60
+            canvas.save()
+            canvas.translate(w/2, h/2)
+            canvas.drawLine(-currSize/2, currSize/2, currSize/2, currSize/2, paint)
+            canvas.drawLine(currSize/2, currSize/2, 0F, -currSize/2, paint)
+            canvas.drawLine(0f, -currSize/2, -currSize/2, currSize/2, paint)
+            canvas.restore()
+            next?.draw(canvas, paint)
         }
     }
 }
