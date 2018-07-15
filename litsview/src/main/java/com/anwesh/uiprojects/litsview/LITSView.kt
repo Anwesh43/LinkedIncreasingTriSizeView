@@ -20,6 +20,8 @@ class LITSView(ctx : Context) : View(ctx) {
 
     private val renderer : Renderer = Renderer(this)
 
+    var onCompleteListener : OnAnimationCompletionListener ?= null
+
     override fun onDraw(canvas : Canvas) {
         renderer.render(canvas, paint)
     }
@@ -31,6 +33,10 @@ class LITSView(ctx : Context) : View(ctx) {
             }
         }
         return true
+    }
+
+    fun addOnCompleteListener(onComplete : (Int) -> Unit) {
+        onCompleteListener = OnAnimationCompletionListener(onComplete)
     }
 
     data class State(var scale : Float = 0f, var dir : Float = 0f, var prevScale : Float = 0f) {
@@ -173,6 +179,9 @@ class LITSView(ctx : Context) : View(ctx) {
             animator.update {
                 lits.update {i, it ->
                     animator.stop()
+                    when (it) {
+                        1f -> view.onCompleteListener?.onComplete?.invoke(i)
+                    }
                 }
             }
         }
@@ -192,4 +201,6 @@ class LITSView(ctx : Context) : View(ctx) {
             return view
         }
     }
+
+    data class OnAnimationCompletionListener(var onComplete : (Int) -> Unit)
 }
