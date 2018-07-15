@@ -139,6 +139,11 @@ class LITSView(ctx : Context) : View(ctx) {
             canvas.drawLine(currSize/2, currSize/2, 0F, -currSize/2, paint)
             canvas.drawLine(0f, -currSize/2, -currSize/2, currSize/2, paint)
             canvas.restore()
+            val wGap : Float = w / nodes
+            canvas.save()
+            canvas.translate(0f, 0.9f * h)
+            canvas.drawLine(i*wGap + wGap * state.scale, 0f,(i + 1) * wGap, 0f, paint)
+            canvas.restore()
             next?.draw(canvas, paint)
         }
     }
